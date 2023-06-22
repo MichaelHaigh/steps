@@ -1,0 +1,128 @@
+kind: step-type
+version: '1.0'
+metadata:
+  name: netapp-tme/astra-control-toolkit
+  version: 0.1.0
+  isPublic: true
+  description: >-
+    Perform application data management tasks (backup, snapshot, clone, etc.)
+    on your Kubernetes applications managed by NetApp Astra Control.
+  sources:
+    - >-
+      https://github.com/MichaelHaigh/steps/tree/master/incubating/astra-control
+  stage: incubating
+  maintainers:
+    - name: Michael Haigh
+    - email: michael.haigh@netapp.com
+  categories:
+    - storage
+  official: false
+  tags: []
+  icon:
+    type: svg
+    url: https://bluexp.netapp.com/hubfs/Astra_Control_logo.svg
+    background: "#ffffff"
+  examples:
+    - description: actoolkit-create-backup
+      workflow:
+        astra-control-toolkit:
+          title: "Astra Control Toolkit Create Backup"
+          type: astra-control-toolkit
+          arguments:
+            AC_CONFIG_SECRET: ac_config_yaml
+            ACTOOLKIT_VERSION: 2.6.5
+            APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
+            BACKUP_NAME: cf-backup-`date "+%Y%m%d%H%M%S"`
+            COMMANDS:
+              - actoolkit create backup $APP_ID $BACKUP_NAME
+    - description: actoolkit-create-snapshot
+      workflow:
+        astra-control-toolkit:
+          title: "Astra Control Toolkit Create Snapshot"
+          type: astra-control-toolkit
+          arguments:
+            AC_CONFIG_SECRET: ac_config_yaml
+            ACTOOLKIT_VERSION: 2.6.5
+            APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
+            SNAP_NAME: cf-snap-`date "+%Y%m%d%H%M%S"`
+            COMMANDS:
+              - actoolkit create snapshot $APP_ID $SNAP_NAME
+    - description: actoolkit-live-clone-app
+      workflow:
+        astra-control-toolkit:
+          title: "Astra Control Toolkit Live Clone App"
+          type: astra-control-toolkit
+          arguments:
+            AC_CONFIG_SECRET: ac_config_yaml
+            ACTOOLKIT_VERSION: 2.6.5
+            APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
+            CLONE_APP_NAME: cf-clone-`date "+%Y%m%d%H%M%S"`
+            CLUSTER_ID: 928b9df2-9dd3-4cf6-ad80-ef5a2e546084
+            COMMANDS:
+              - actoolkit clone --sourceAppID $APP_ID --cloneAppName $CLONE_APP_NAME --clusterID $CLUSTER_ID
+    - description: actoolkit-snap-clone-app
+      workflow:
+        astra-control-toolkit:
+          title: "Astra Control Toolkit Snapshot and Clone App"
+          type: astra-control-toolkit
+          arguments:
+            AC_CONFIG_SECRET: ac_config_yaml
+            ACTOOLKIT_VERSION: 2.6.5
+            APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
+            CLONE_APP_NAME: cf-clone-`date "+%Y%m%d%H%M%S"`
+            CLUSTER_ID: 928b9df2-9dd3-4cf6-ad80-ef5a2e546084
+            SNAP_NAME: cf-snap-`date "+%Y%m%d%H%M%S"`
+            COMMANDS:
+              - actoolkit create snapshot $APP_ID $SNAP_NAME
+              - SNAP_ID=$(actoolkit -o json list snapshots -a $APP_ID | jq -r --arg SNAP_NAME "$SNAP_NAME" '.items[] | select(.name==$SNAP_NAME) | .id')
+              - actoolkit clone --snapshotID $SNAP_ID --cloneAppName $CLONE_APP_NAME --clusterID $CLUSTER_ID
+spec:
+  arguments: |-
+    {
+      "definitions": {},
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "additionalProperties": true,
+      "patterns": [],
+      "required": [
+        "COMMANDS"
+      ],
+      "properties": {
+        "ACTOOLKIT_VERSION": {
+          "type": "string",
+          "description": "The actoolkit version (https://github.com/NetApp/netapp-astra-toolkits/tags)",
+          "default": "2.6.5"
+        },
+        "AC_CONFIG_SECRET": {
+          "type": "string",
+          "description": "The name of the shared configuration secret YAML containing the actoolkit config file",
+          "default": "ac_config_yaml"
+        },
+        "COMMANDS": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Any number of actoolkit commands to run"
+        }
+      }
+    }
+
+  stepsTemplate: |-
+    config_file:
+      image: codefresh/cli
+      commands:
+        - "echo $(codefresh get context [[.Arguments.AC_CONFIG_SECRET]] --output=yaml --decrypt | yq -r '.spec.data') > config.yaml"
+    astra_control_toolkit:
+      image: 'docker.io/netapp/astra-toolkits:[[.Arguments.ACTOOLKIT_VERSION]]-minimal'
+      environment:
+      [[ range $key, $val := .Arguments ]]
+        - '[[ $key ]]=[[ $val ]]'
+      [[- end ]]
+      commands:
+      [[ range $arg := .Arguments.COMMANDS ]]
+        - '[[ $arg ]]'
+      [[- end ]]
+  delimiters:
+    left: '[['
+    right: ']]'
