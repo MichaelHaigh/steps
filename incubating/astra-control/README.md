@@ -21,29 +21,29 @@ Additionally, this pipeline step supports any number of *custom* arguments, whic
 To create a backup of application `b9451964-d651-486f-a80a-563d50bb0eaa`:
 
 ```yaml
-astra-control-toolkit:
+astra_control_toolkit:
   title: Astra Control Toolkit Create Backup
   type: astra-control-toolkit
   arguments:
     AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
     APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
-    BACKUP_NAME: cf-backup-`date "+%Y%m%d%H%M%S"`
     COMMANDS:
-      - actoolkit create backup $APP_ID $BACKUP_NAME
+      - actoolkit create backup $APP_ID cf-backup-$(date "+%Y%m%d%H%M%S")
 ```
 
-The above example is functionally equivalent to this:
+The above example is functionally equivalent to:
 
 ```yaml
 astra-control-toolkit:
   title: Astra Control Toolkit Create Backup
   type: astra-control-toolkit
   arguments:
-    AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
     COMMANDS:
-      - actoolkit create backup b9451964-d651-486f-a80a-563d50bb0eaa cf-backup-`date "+%Y%m%d%H%M%S"`
+      - >-
+        actoolkit create backup b9451964-d651-486f-a80a-563d50bb0eaa
+        cf-backup-$(date "+%Y%m%d%H%M%S")
 ```
 
 To create a snapshot:
@@ -56,9 +56,8 @@ astra-control-toolkit:
     AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
     APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
-    SNAP_NAME: cf-snap-`date "+%Y%m%d%H%M%S"`
     COMMANDS:
-      - actoolkit create snapshot $APP_ID $SNAP_NAME
+      - actoolkit create snapshot $APP_ID cf-snap-$(date "+%Y%m%d%H%M%S")
 ```
 
 To perform a live clone of a running application:
@@ -71,35 +70,11 @@ astra-control-toolkit:
     AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
     APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
-    CLONE_APP_NAME: cf-clone-`date "+%Y%m%d%H%M%S"`
     CLUSTER_ID: 928b9df2-9dd3-4cf6-ad80-ef5a2e546084
     COMMANDS:
       - >-
-        actoolkit clone --sourceAppID $APP_ID --cloneAppName $CLONE_APP_NAME
-        --clusterID $CLUSTER_ID
-```
-
-To create a snapshot of an application, and then clone from that snapshot:
-
-```yaml
-astra-control-toolkit:
-  title: Astra Control Toolkit Snapshot and Clone App
-  type: astra-control-toolkit
-  arguments:
-    AC_CONFIG_SECRET: ac_config_yaml
-    ACTOOLKIT_VERSION: 2.6.5
-    APP_ID: b9451964-d651-486f-a80a-563d50bb0eaa
-    CLONE_APP_NAME: cf-clone-`date "+%Y%m%d%H%M%S"`
-    CLUSTER_ID: 928b9df2-9dd3-4cf6-ad80-ef5a2e546084
-    SNAP_NAME: cf-snap-`date "+%Y%m%d%H%M%S"`
-    COMMANDS:
-      - actoolkit create snapshot $APP_ID $SNAP_NAME
-      - >-
-        SNAP_ID=$(actoolkit -o json list snapshots -a $APP_ID | jq -r --arg
-        SNAP_NAME "$SNAP_NAME" '.items[] | select(.name==$SNAP_NAME) | .id')
-      - >-
-        actoolkit clone --snapshotID $SNAP_ID --cloneAppName $CLONE_APP_NAME
-        --clusterID $CLUSTER_ID
+        actoolkit clone --cloneAppName cf-clone-$(date "+%Y%m%d%H%M%S")
+        --sourceAppID $APP_ID --clusterID $CLUSTER_ID
 ```
 
 ## Testing and Debugging
