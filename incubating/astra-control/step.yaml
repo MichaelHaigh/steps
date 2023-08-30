@@ -1,7 +1,7 @@
 kind: step-type
 version: '1.0'
 metadata:
-  name: netapp-tme/astra-control-toolkit
+  name: netapp-astra/astra-control-toolkit
   version: 0.1.0
   isPublic: true
   description: >-
@@ -27,7 +27,7 @@ metadata:
       workflow:
         astra_control_toolkit:
           title: "Astra Control Toolkit Create Backup"
-          type: astra-control-toolkit
+          type: netapp-astra/astra-control-toolkit
           arguments:
             AC_CONFIG_SECRET: ac_config_yaml
             ACTOOLKIT_VERSION: 2.6.5
@@ -38,7 +38,7 @@ metadata:
       workflow:
         astra_control_toolkit:
           title: "Astra Control Toolkit Create Snapshot"
-          type: astra-control-toolkit
+          type: netapp-astra/astra-control-toolkit
           arguments:
             AC_CONFIG_SECRET: ac_config_yaml
             ACTOOLKIT_VERSION: 2.6.5
@@ -49,7 +49,7 @@ metadata:
       workflow:
         astra_control_toolkit:
           title: "Astra Control Toolkit Live Clone App"
-          type: astra-control-toolkit
+          type: netapp-astra/astra-control-toolkit
           arguments:
             AC_CONFIG_SECRET: ac_config_yaml
             ACTOOLKIT_VERSION: 2.6.5

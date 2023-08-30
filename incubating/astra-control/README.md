@@ -23,7 +23,7 @@ To create a backup of application `b9451964-d651-486f-a80a-563d50bb0eaa`:
 ```yaml
 astra_control_toolkit:
   title: Astra Control Toolkit Create Backup
-  type: astra-control-toolkit
+  type: netapp-astra/astra-control-toolkit
   arguments:
     AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
@@ -37,7 +37,7 @@ The above example is functionally equivalent to:
 ```yaml
 astra-control-toolkit:
   title: Astra Control Toolkit Create Backup
-  type: astra-control-toolkit
+  type: netapp-astra/astra-control-toolkit
   arguments:
     ACTOOLKIT_VERSION: 2.6.5
     COMMANDS:
@@ -51,7 +51,7 @@ To create a snapshot:
 ```yaml
 astra-control-toolkit:
   title: Astra Control Toolkit Create Snapshot
-  type: astra-control-toolkit
+  type: netapp-astra/astra-control-toolkit
   arguments:
     AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
@@ -65,7 +65,7 @@ To perform a live clone of a running application:
 ```yaml
 astra-control-toolkit:
   title: Astra Control Toolkit Live Clone App
-  type: astra-control-toolkit
+  type: netapp-astra/astra-control-toolkit
   arguments:
     AC_CONFIG_SECRET: ac_config_yaml
     ACTOOLKIT_VERSION: 2.6.5
