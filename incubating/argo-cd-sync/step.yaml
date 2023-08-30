@@ -1,7 +1,7 @@
 kind: step-type
 metadata:
   name: argo-cd-sync
-  version: 1.1.0
+  version: 1.3.0
   isPublic: true
   description: Syncs Argo CD apps managed by our GitOps Runtimes
   sources:
@@ -37,7 +37,7 @@ metadata:
           arguments:
             RUNTIME: my-runtime
             APPLICATION: my-app
-            WAIT_FOR_HEALTHY: true
+            WAIT_HEALTHY: true
             INTERVAL: 30
             MAX_CHECKS: 5
     - description: Sync, wait and rollback.
@@ -48,7 +48,7 @@ metadata:
           arguments:
             RUNTIME: my-runtime
             APPLICATION: my-app
-            WAIT_FOR_HEALTHY: true
+            WAIT_HEALTHY: true
             INTERVAL: 60
             MAX_CHECKS: 3
             ROLLBACK: true
@@ -94,6 +94,11 @@ spec:
           "description": "OPTIONAL - Initiate a rollback to the latest Healdy revision if the Sync and Wait does not become healthy",
           "default": false
         },
+        "WAIT_ROLLBACK": {
+          "type": "boolean",
+          "description": "OPTIONAL - Wait for the app to be healthy after a rollback. Forces ROLLBACK to true",
+          "default": false
+        },
         "LOG_LEVEL": {
           "type": "string",
           "description": "OPTIONAL - set the log level, e.g. 'debug', 'info', 'warn', 'error', 'critical' (default 'error')",
@@ -106,7 +111,7 @@ spec:
         },
         "IMAGE_TAG": {
           "type": "string",
-          "default": "1.1.0",
+          "default": "1.3.0",
           "description": "OPTIONAL - To overwrite the tag to use"
         }
       }
@@ -127,7 +132,7 @@ spec:
                 "description": "The heatlh status of the application: HEALTHY, PROGRESSING, DEGRADED or SUSPENDED"
             },
             "ROLLBACK_EXECUTED": {
-                "type": "boolean",
+                "type": "string",
                 "description": "A flag to indicate if a rollback was executed or not"
             }
         }
